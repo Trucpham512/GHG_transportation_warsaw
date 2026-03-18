@@ -101,269 +101,74 @@ leaflet() %>%
             labels = c("Selected Street", "Bus Routes"),
             title = "Map Layers")
 
-# 13. HEATMAP CO2
-pal <- colorNumeric(
-  palette = "YlOrRd",        # yellow → orange → red
-  domain = routes_sf$CO2
-)
+# 13. CO2 MAP
+pal <- colorNumeric("YlOrRd", domain = routes_sf$CO2)
 
-leaflet() %>%
+map_CO2 <- leaflet() %>%
   addTiles() %>%
-  addPolylines(
-    data = routes_sf,
-    color = ~pal(CO2),       # màu theo CO₂
-    weight = 5,
-    opacity = 0.9,
-    popup = ~paste0(
-      "<b>Shape ID:</b> ", shape_id, "<br>",
-      "<b>Length:</b> ", round(length_km, 2), " km<br>",
-      "<b>CO₂:</b> ", round(CO2, 1), " g<br>",
-      "<b>NOx:</b> ", round(NOx, 2), " g<br>",
-      "<b>PM10:</b> ", round(PM10, 3), " g"
-    )
-  ) %>%
-  addPolylines(
-    data = osm_street,
-    color = "red",
-    weight = 6,
-    opacity = 1
-  ) %>%
-  addLegend(
-    "bottomright",
-    pal = pal,
-    values = routes_sf$CO2,
-    title = "CO₂ (g)",
-    opacity = 1
-  )
+  addPolylines(data = routes_sf, color = ~pal(CO2), weight = 5, opacity = 0.9) %>%
+  addPolylines(data = osm_street, color = "red", weight = 6) %>%
+  addLegend("bottomright", pal = pal, values = routes_sf$CO2, title = "<span style='font-size:18px;'>CO₂ (g)</span>", opacity = 1)
 
-# 14. HEATMAP NOx
-pal_nox <- colorNumeric(
-  palette = "PuBuGn",      # xanh → tím
-  domain = routes_sf$NOx
-)
+# 14. NOx MAP
+pal_nox <- colorNumeric("PuBuGn", domain = routes_sf$NOx)
 
-leaflet() %>%
+map_NOx <- leaflet() %>%
   addTiles() %>%
-  addPolylines(
-    data = routes_sf,
-    color = ~pal_nox(NOx),
-    weight = 5,
-    opacity = 0.9,
-    popup = ~paste0(
-      "<b>Shape ID:</b> ", shape_id, "<br>",
-      "<b>NOx:</b> ", round(NOx, 2), " g<br>",
-      "<b>CO₂:</b> ", round(CO2, 1), " g<br>",
-      "<b>PM10:</b> ", round(PM10, 3), " g"
-    )
-  ) %>%
-  addPolylines(
-    data = osm_street,
-    color = "red",
-    weight = 6,
-    opacity = 1
-  ) %>%
+  addPolylines(data = routes_sf, color = ~pal_nox(NOx), weight = 5, opacity = 0.9) %>%
+  addPolylines(data = osm_street, color = "red", weight = 6) %>%
   addLegend(
     "bottomright",
     pal = pal_nox,
     values = routes_sf$NOx,
-    title = "NOx (g)",
+    title = "<span style='font-size:18px;'>NOx (g)</span>",
     opacity = 1
   )
 
-# 15. HEATMAP PM10
-pal_pm10 <- colorNumeric(
-  palette = "YlGnBu",      # vàng → xanh dương
-  domain = routes_sf$PM10
-)
 
-leaflet() %>%
+# 15. PM10 MAP
+pal_pm10 <- colorNumeric("YlGnBu", domain = routes_sf$PM10)
+
+map_PM10 <- leaflet() %>%
   addTiles() %>%
-  addPolylines(
-    data = routes_sf,
-    color = ~pal_pm10(PM10),
-    weight = 5,
-    opacity = 0.9,
-    popup = ~paste0(
-      "<b>Shape ID:</b> ", shape_id, "<br>",
-      "<b>PM10:</b> ", round(PM10, 3), " g<br>",
-      "<b>CO₂:</b> ", round(CO2, 1), " g<br>",
-      "<b>NOx:</b> ", round(NOx, 2), " g"
-    )
-  ) %>%
-  addPolylines(
-    data = osm_street,
-    color = "red",
-    weight = 6,
-    opacity = 1
-  ) %>%
+  addPolylines(data = routes_sf, color = ~pal_pm10(PM10), weight = 5, opacity = 0.9) %>%
+  addPolylines(data = osm_street, color = "red", weight = 6) %>%
   addLegend(
     "bottomright",
     pal = pal_pm10,
     values = routes_sf$PM10,
-    title = "PM10 (g)",
+    title = "<span style='font-size:18px;'>PM10 (g)</span>",
     opacity = 1
   )
 
-# 16. HEATMAP CO2eq (IPCC proxy)
-routes_sf$CO2eq <- routes_sf$CO2 +
-  routes_sf$NOx * 0.02 +
-  routes_sf$PM10 * 0.004
+# 16. CO2eq MAP
+routes_sf$CO2eq <- routes_sf$CO2 + routes_sf$NOx * 0.02 + routes_sf$PM10 * 0.004
+pal_co2eq <- colorNumeric("RdPu", domain = routes_sf$CO2eq)
 
-pal_co2eq <- colorNumeric(
-  palette = "RdPu",      # hồng → tím
-  domain = routes_sf$CO2eq
-)
-
-leaflet() %>%
+map_CO2eq <- leaflet() %>%
   addTiles() %>%
-  addPolylines(
-    data = routes_sf,
-    color = ~pal_co2eq(CO2eq),
-    weight = 5,
-    opacity = 0.9,
-    popup = ~paste0(
-      "<b>Shape ID:</b> ", shape_id, "<br>",
-      "<b>CO₂eq:</b> ", round(CO2eq, 1), " g<br>",
-      "<b>CO₂:</b> ", round(CO2, 1), " g<br>",
-      "<b>NOx:</b> ", round(NOx, 2), " g<br>",
-      "<b>PM10:</b> ", round(PM10, 3), " g"
-    )
-  ) %>%
-  addPolylines(
-    data = osm_street,
-    color = "red",
-    weight = 6,
-    opacity = 1
-  ) %>%
+  addPolylines(data = routes_sf, color = ~pal_co2eq(CO2eq), weight = 5, opacity = 0.9) %>%
+  addPolylines(data = osm_street, color = "red", weight = 6) %>%
   addLegend(
     "bottomright",
     pal = pal_co2eq,
     values = routes_sf$CO2eq,
-    title = "CO₂eq (g)",
+    title = "<span style='font-size:18px;'>CO₂eq (g)</span>",
     opacity = 1
   )
 
-# STEP 17 — CREATE SEGMENTS (ROBUST FIX)
-library(purrr)
+# STEP 23 — EXPORT HIGH-RESOLUTION MAPS (2000px, STABLE VERSION)
 
-make_segments <- function(shape_row) {
-  geom <- shape_row$geometry
-  
-  # Convert MULTILINESTRING → LINESTRING
-  if (inherits(geom, "MULTILINESTRING")) {
-    geom <- st_line_merge(geom)
-  }
-  
-  # Skip empty or invalid geometry
-  if (st_is_empty(geom)) {
-    return(NULL)
-  }
-  
-  coords <- st_coordinates(geom)
-  
-  # Skip shapes with fewer than 2 points
-  if (nrow(coords) < 2) {
-    return(NULL)
-  }
-  
-  # Build segments
-  segs <- map2(
-    .x = coords[-nrow(coords), ],
-    .y = coords[-1, ],
-    ~ st_linestring(rbind(.x, .y))
-  )
-  
-  st_sf(
-    shape_id = shape_row$shape_id,
-    geometry = st_sfc(segs, crs = st_crs(shape_row))
-  )
-}
+library(mapview)
+library(webshot)
 
-segments_sf <- map_dfr(1:nrow(routes_sf), ~ make_segments(routes_sf[.x, ]))
+# Install PhantomJS once (if already installed, this line is ignored)
+webshot::install_phantomjs()
 
-# STEP 18
-segments_sf$length_m  <- as.numeric(st_length(segments_sf))
-segments_sf$length_km <- segments_sf$length_m / 1000
+# Export maps at 2000px resolution
+mapshot(map_CO2,           file = "CO2_map.png",           vwidth = 2000, vheight = 1400)
+mapshot(map_NOx,           file = "NOx_map.png",           vwidth = 2000, vheight = 1400)
+mapshot(map_PM10,          file = "PM10_map.png",          vwidth = 2000, vheight = 1400)
+mapshot(map_CO2eq,         file = "CO2eq_map.png",         vwidth = 2000, vheight = 1400)
 
-# STEP 19
-EF_CO2  <- 1100
-EF_NOx  <- 8
-EF_PM10 <- 0.3
 
-segments_sf$CO2  <- segments_sf$length_km * EF_CO2
-segments_sf$NOx  <- segments_sf$length_km * EF_NOx
-segments_sf$PM10 <- segments_sf$length_km * EF_PM10
-
-segments_sf$CO2eq <- segments_sf$CO2 +
-  segments_sf$NOx * 0.02 +
-  segments_sf$PM10 * 0.004
-
-# STEP 20
-pal_seg <- colorNumeric("YlOrRd", domain = segments_sf$CO2)
-
-leaflet() %>%
-  addTiles() %>%
-  addPolylines(
-    data = segments_sf,
-    color = ~pal_seg(CO2),
-    weight = 4,
-    opacity = 0.9
-  ) %>%
-  addLegend("bottomright", pal = pal_seg, values = segments_sf$CO2,
-            title = "CO₂ per segment (g)")
-
-# 21. CREATE EMISSION INDEX (ALL)
-norm <- function(x) (x - min(x)) / (max(x) - min(x))
-
-segments_sf$CO2_norm  = norm(segments_sf$CO2)
-segments_sf$NOx_norm  = norm(segments_sf$NOx)
-segments_sf$PM10_norm = norm(segments_sf$PM10)
-
-# Weights (adjustable)
-w_CO2  = 1
-w_NOx  = 1
-w_PM10 = 1
-
-segments_sf$EmissionIndex =
-  segments_sf$CO2_norm  * w_CO2 +
-  segments_sf$NOx_norm  * w_NOx +
-  segments_sf$PM10_norm * w_PM10
-
-# segments_sf$EmissionIndex <- norm(segments_sf$EmissionIndex)
-
-# 22. HEATMAP EMISSION INDEX (ALL)
-pal_total <- colorNumeric(
-  palette = "inferno",   # tím → đỏ → vàng (đẹp và rõ)
-  domain = segments_sf$EmissionIndex
-)
-
-leaflet() %>%
-  addTiles() %>%
-  addPolylines(
-    data = segments_sf,
-    color = ~pal_total(EmissionIndex),
-    weight = 4,
-    opacity = 0.9,
-    popup = ~paste0(
-      "<b>Shape ID:</b> ", shape_id, "<br>",
-      "<b>Segment length:</b> ", round(length_km, 4), " km<br><br>",
-      "<b>CO₂:</b> ", round(CO2, 2), " g<br>",
-      "<b>NOx:</b> ", round(NOx, 3), " g<br>",
-      "<b>PM10:</b> ", round(PM10, 4), " g<br>",
-      "<b>CO₂eq:</b> ", round(CO2eq, 2), " g<br><br>",
-      "<b>Emission Index:</b> ", round(EmissionIndex, 3)
-    )
-  ) %>%
-  addPolylines(
-    data = osm_street,
-    color = "red",
-    weight = 6,
-    opacity = 1
-  ) %>%
-  addLegend(
-    "bottomright",
-    pal = pal_total,
-    values = segments_sf$EmissionIndex,
-    title = "Combined Emission Index",
-    opacity = 1
-  )
